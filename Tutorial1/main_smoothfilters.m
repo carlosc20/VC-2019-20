@@ -63,10 +63,10 @@ switch filteringDomain
 
     case 'frequency'
             
-        s = size(I);
+        s = size(noisy);
         
         % Padding, centrar e DFT
-        F = imgToDft(I,s);
+        F = imgToDft(noisy,s);
         
         % Gerar o filtro
         
