@@ -1,7 +1,7 @@
 
-% params:
-% imgFileName - nome do ficheiro de imagem greyscale
 function [noisy,smoothed] = main_smoothfilters(I,noiseType,noiseParams,filteringDomain,smoothingType,filterParams)
+
+I = double(I)/255;
 
 %%%%% noise
 nargs = size(noiseParams,2);
@@ -62,25 +62,19 @@ switch filteringDomain
         end
 
     case 'frequency'
-        
-        I = double(I)/255;
-        
+            
         s = size(I);
-        % Padding
-        P = padarray(I, s, 0,'post');
         
-        % Centrar, multiplicar a imagem por (-1)^(x+y)
-        C = center(P);
+        % Padding, centrar e DFT
+        F = imgToDft(I,s);
         
-        % Calcular DFT
-        F = fft2(C);
+        % Gerar o filtro
         
         hsize = 10;     % kernel size
         if nargs > 0
             hsize = filterParams(1);
         end
         
-        % Gerar o filtro
         switch smoothingType
             case 'butterworth'
                 n = 2;          % order
@@ -97,7 +91,7 @@ switch filteringDomain
                 H = butterworthFilter(hsize, n, d0);
 
             case 'gaussian'
-                sigma = 5;              % standard deviation
+                sigma = 5;      % standard deviation
                 
                 if nargs > 1
                     sigma = filterParams(2);
@@ -110,28 +104,41 @@ switch filteringDomain
         end
         
         % Padding, centrar e DFT do filtro
-        H = padarray(H, 2*s - size(H),'post');
-        H = center(H);
-        H = fft2(H);
+        H = imgToDft(H,2*s - size(H));
         
-        % G(u,v) = H(u,v)F(u,v)
+        % Multiplicar pelo filtro, G(u,v) = H(u,v)F(u,v)
         G = H .* F;
 
-        % gp(x,y) = {real{inverse DFT[G(u,v)]}(-1)^(x+y)
-        G = real(ifft2(G));
-        
-        % Descentrar
-        G = center(G);
-        
-        % Resultado final g(x,y) ao extrair a região M X N
-        smoothed = G(1:s(1),1:s(2));
+        % Inversa do DFT, descentrar e tirar padding
+        smoothed = imgFromDft(G,s);
        
     otherwise
         error('Unknown filtering domain, options: spatial, frequency');
 end
-
 end
 
+
+function B = imgFromDft(A,size)
+    % gp(x,y) = {real{inverse DFT[G(u,v)]}(-1)^(x+y)
+    C = real(ifft2(A));
+
+    % Descentrar
+    P = center(C);
+
+    % Resultado final g(x,y) ao extrair a região M X N
+    B = P(1:size(1),1:size(2));
+end
+
+function B = imgToDft(A,size)
+    % Padding
+    P = padarray(A, size, 0,'post');
+
+    % Centrar, multiplicar a imagem por (-1)^(x+y)
+    C = center(P);
+
+    % Calcular DFT
+    B = fft2(C);
+end
 
 function B = center(A)
     [l,c] = size(A);
