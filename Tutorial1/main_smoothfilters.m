@@ -23,7 +23,7 @@ switch noiseType
          if nargs > 1
            var_gauss = noiseParams(2);
          end
-         % adds Gaussian white noise with mean m and variance var_gauss.
+         % adds Gaussian white noise with mean m and variance var_gauss
          noisy = imnoise(I,'gaussian',m,var_gauss);
 
     otherwise
@@ -47,13 +47,14 @@ switch filteringDomain
                 smoothed = imfilter(noisy,h);
 
             case 'gaussian'
-                sigma = 5;      % standard deviation
+                sigma = 0.5;      % standard deviation
                 if nargs > 1
                     sigma = filterParams(2);
                 end
                 h = fspecial('gaussian', hsize, sigma);
                 smoothed = imfilter(noisy,h);
-                
+                % smoothed = imgaussfilt(noisy,sigma,'FilterSize',hsize,'FilterDomain','spatial');
+
             case 'median'
                 smoothed = medfilt2(noisy, [hsize hsize]);
 
@@ -77,26 +78,21 @@ switch filteringDomain
         
         switch smoothingType
             case 'butterworth'
-                n = 2;          % order
-                d0 = 15;        % variance
-                
+                n = 2;          % default order
+                d0 = 15;        % default variance
                 if nargs > 1
                     n = filterParams(2);
                 end
-                
                 if nargs > 2
                     d0 = filterParams(3);
                 end
-                
                 H = butterworthFilter(hsize, n, d0);
 
             case 'gaussian'
-                sigma = 5;      % standard deviation
-                
+                sigma = 5;      % default standard deviation
                 if nargs > 1
                     sigma = filterParams(2);
                 end
-                
                 H = fspecial('gaussian', hsize, sigma);
                
             otherwise
