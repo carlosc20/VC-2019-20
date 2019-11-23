@@ -1,9 +1,11 @@
 I=imread('..\lena.jpg');
 
-G = imnoise(I,'gaussian');
+m = 0;              %mean
+var_gauss = 0.01;   %variance
+noisy = imnoise(I,'gaussian',m,var_gauss);
 imshow(G);
 
-[N,S] = Gaussian_smoothing(I,[0 0.01],[10 5]);
+S = Gaussian_smoothing(I,[10 5]);
 
 figure;
 imshow(S);
