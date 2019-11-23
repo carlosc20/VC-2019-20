@@ -1,5 +1,3 @@
-
-
 baboon = rgb2gray(imread('baboon.png'));
 castle = rgb2gray(imread('castle.png'));
 lena = rgb2gray(imread('lena.jpg'));
