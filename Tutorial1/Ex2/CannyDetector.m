@@ -1,11 +1,12 @@
-I=imread('..\lena.jpg');
+I=imread('..\originais\lena.jpg');
 
 m = 0;              %mean
 var_gauss = 0.01;   %variance
-noisy = imnoise(I,'gaussian',m,var_gauss);
-imshow(G);
 
-S = Gaussian_smoothing(I,[10 5]);
+N = imnoise(I,'gaussian',m,var_gauss);
 
-figure;
-imshow(S);
+S = Gaussian_smoothing(I, [10,3]);
+
+[G,O] = gradient(S);
+
+T = nonmax(G,O);

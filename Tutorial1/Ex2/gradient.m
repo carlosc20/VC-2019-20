@@ -9,6 +9,8 @@ function [Gradient, Orientation] = gradient(I)
     Gh = im2double(imfilter(I,SobelH));
     Gv = im2double(imfilter(I,SobelV));
     
+    Gv = Gv.*(-1);
+    
     Gradient = sqrt((Gh.^2)+(Gv.^2));
     Orientation = atan2(Gh,Gv);
 
