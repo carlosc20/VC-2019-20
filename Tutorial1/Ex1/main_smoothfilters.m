@@ -1,8 +1,6 @@
 
 function [noisy,smoothed] = main_smoothfilters(I,noiseType,noiseParams,filteringDomain,smoothingType,filterParams)
 
-I = double(I)/255;
-
 %%%%% noise
 nargs = size(noiseParams,2);
 switch noiseType
@@ -51,6 +49,8 @@ switch filteringDomain
                 if nargs > 1
                     sigma = filterParams(2);
                 end
+                %h = fspecial('gaussian', hsize, sigma);
+                %smoothed = imfilter(noisy,h);
                 smoothed = imgaussfilt(noisy,sigma,'FilterSize',hsize,'FilterDomain','spatial'); % convolution
 
             case 'median'
@@ -111,6 +111,23 @@ switch filteringDomain
 end
 end
 
+% low pass butterworth
+function h = butterworthFilter(hsize, n, d0)
+    h = zeros(hsize, hsize);
+    m = (hsize + 1)/2;
+    t = 0;
+    for u = 1:hsize
+        for v = 1:hsize
+            x = u - m;
+            y = v - m;
+            d = sqrt(x.^2 + y.^2);
+            a = 1./(1 + (d / d0).^(2 .* n));
+            h(u, v) = a;
+            t = t + a;
+        end
+    end
+    h = h ./ t;
+end
 
 function B = imgFromDft(A,size)
     % gp(x,y) = {real{inverse DFT[G(u,v)]}(-1)^(x+y)
@@ -144,14 +161,3 @@ function B = center(A)
     end
 end
 
-function h = butterworthFilter(hsize, n, d0)
-    h = zeros(hsize, hsize);
-    for u = 1:hsize
-        for v = 1:hsize
-            % b = sqrt(2) - 1;
-            d = sqrt(u.^2 + v^2);
-            x = d ./ d0;
-            h(u, v) = 1./(1 + x.^(2 * n));
-        end
-    end
-end
