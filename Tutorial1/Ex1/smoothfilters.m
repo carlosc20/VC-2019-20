@@ -8,7 +8,7 @@ noiseParams = [0,0.01];
 
 filteringDomain = 'frequency';
 smoothingType = 'butterworth';
-filterParams = [5,2,0.4];
+filterParams = [10,4,10];
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % funcao:
@@ -29,11 +29,12 @@ imwrite(noisy,output);
 
 
 % mostra imagens
+%{
 figure('Name','Resultado');
 subplot(1,3,1), imshow(image); title('original');
 subplot(1,3,2), imshow(noisy); title('noisy');
 subplot(1,3,3), imshow(smoothed); title('smoothed');
-
+%}
 
 % mostra espetro
 %{
