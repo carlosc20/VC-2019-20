@@ -5,6 +5,14 @@ function I = nonmax(Magnitude, Orientation)
     lines = size(O,1);
     cols = size(O,2);
     
+    for i=1:lines
+        for j=1:cols
+            while O(i,j)<0
+                O(i,j)=360+O(i,j);
+            end
+        end
+    end
+    
 %   Usando a orientação, transforma anglos para 0º, 45º, 90º ou 135º
     angles = zeros(lines, cols);
     for i = 1  : lines

@@ -1,12 +1,18 @@
-I=imread('..\originais\lena.jpg');
+lena = '..\originais\lena.jpg';
 
-m = 0;              %mean
-var_gauss = 0.01;   %variance
+%img = 'C:\Users\luisj\Desktop\Luís Macedo\Programming\VC-Aulas\eight.png';
+img=lena;
+I=rgb2gray(imread(img));
+m = 0.1;              %mean
+var_gauss = 0.0;   %variance
 
 N = imnoise(I,'gaussian',m,var_gauss);
 
-S = Gaussian_smoothing(I, [10,3]);
+img = split(img, '\');
+img = split(img(size(img,1)), '.');
+img = img{1};
+img = strcat('Output/',img);
 
-[G,O] = gradient(S);
+[G, T, H] = main_CannyDetector(I, img, [3, 1], [0.125, 0.25]);
 
-T = nonmax(G,O);
+%figure('Name', 'Matlab');imshow(edge(I, 'Canny', [0.125,0.25], 1.4));
