@@ -10,9 +10,6 @@ function [G, T, H] = main_CannyDetector(I,imgpath, smoothing, threshold)
 
     T = nonmax(G,O);
     
-    %highThreshold = 0.25;
-    %lowThreshold = 0.125;
-    
     [L,strongEdges,~] = double_threshold(T, lowThreshold, highThreshold);
 
     H = hysteresis_thresholding(L,strongEdges);
@@ -21,9 +18,9 @@ function [G, T, H] = main_CannyDetector(I,imgpath, smoothing, threshold)
     AfterNonMax = strcat(imgpath, '_edge_canny_nonmax_', num2str(kernel), '_', num2str(sigma), '.png');
     AfterHysteresis = strcat(imgpath, '_edge_canny_hysteresis_', num2str(kernel), '_', num2str(sigma), '.png');    
     
-    imwrite(G, BeforeNonMax);
-    imwrite(T, AfterNonMax);
-    imwrite(H, AfterHysteresis);
+    %imwrite(G, BeforeNonMax);
+    %imwrite(T, AfterNonMax);
+    %imwrite(H, AfterHysteresis);
     
     %figure('Name', 'Smooth');imshow(S);
     %figure('Name', 'Gradiente');imshow(G);

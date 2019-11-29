@@ -5,6 +5,8 @@ function I = nonmax(Magnitude, Orientation)
     lines = size(O,1);
     cols = size(O,2);
     
+    %Passar todos os angulos negativos ou maiores de 360 para maiores de 0
+    %e menores de 360
     for i=1:lines
         for j=1:cols
             while O(i,j)<0
