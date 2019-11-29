@@ -6,7 +6,7 @@ I = double(I)/255;
 %%%%% noise
 nargs = size(noiseParams,2);
 switch noiseType
-    case 'salt & pepper' 
+    case 'salt&pepper' 
          d = 0.05;      % default noise density, 
          if nargs > 0 
            d = noiseParams(1);
@@ -36,7 +36,7 @@ nargs = size(filterParams,2);
 switch filteringDomain
     case 'spatial'
         
-        hsize = 10;     % kernel size
+        hsize = 10;     % default kernel size
         if nargs > 0
             hsize = filterParams(1);
         end
@@ -47,13 +47,11 @@ switch filteringDomain
                 smoothed = imfilter(noisy,h);
 
             case 'gaussian'
-                sigma = 0.5;      % standard deviation
+                sigma = 0.5;      % default standard deviation
                 if nargs > 1
                     sigma = filterParams(2);
                 end
-                h = fspecial('gaussian', hsize, sigma);
-                smoothed = imfilter(noisy,h);
-                % smoothed = imgaussfilt(noisy,sigma,'FilterSize',hsize,'FilterDomain','spatial');
+                smoothed = imgaussfilt(noisy,sigma,'FilterSize',hsize,'FilterDomain','spatial'); % convolution
 
             case 'median'
                 smoothed = medfilt2(noisy, [hsize hsize]);
@@ -71,7 +69,7 @@ switch filteringDomain
         
         % Gerar o filtro
         
-        hsize = 10;     % kernel size
+        hsize = 10;     % default kernel size
         if nargs > 0
             hsize = filterParams(1);
         end
@@ -79,7 +77,7 @@ switch filteringDomain
         switch smoothingType
             case 'butterworth'
                 n = 2;          % default order
-                d0 = 15;        % default variance
+                d0 = 15;        % default cutoff frequency
                 if nargs > 1
                     n = filterParams(2);
                 end
@@ -150,10 +148,10 @@ function h = butterworthFilter(hsize, n, d0)
     h = zeros(hsize, hsize);
     for u = 1:hsize
         for v = 1:hsize
-            b = sqrt(2) - 1;
+            % b = sqrt(2) - 1;
             d = sqrt(u.^2 + v^2);
-            x = b * (d0 / d); 
-            h(u, v) = 1./(1 + x)^(2 * n);
+            x = d ./ d0;
+            h(u, v) = 1./(1 + x.^(2 * n));
         end
     end
 end
