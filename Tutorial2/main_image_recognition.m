@@ -1,11 +1,32 @@
-function [ preProcI, segI, segNoisyI, SNR, sizeHist, coinDist ] = main_image_recognition( I )
+function [ preProcI, segI, segNoisyI, SNR, sizeHist, coinDist ] = main_image_recognition( I, noiseType, noiseParams )
 
+nargs = size(noiseParams,2);
 
+%%% Introduce noise
+if strcmp( noiseType, 'gaussian' )
+    m = 0;                % default mean
+    var_gauss = 0.01;     % default variance
+    
+    if nargs > 0
+        m = noiseParams(1);
+    end
+    if nargs > 1
+        var_gauss = noiseParams(2);
+    end
+    
+    % adds Gaussian white noise with mean m and variance var_gauss
+    noisyI = imnoise( I, 'gaussian', m, var_gauss );
+end
 
-%%%%% Introduce noise
-m = 0;
-var_gauss = 0.01;
-noisyI = imnoise(I,'gaussian',m,var_gauss);
+if strcmp( noiseType, 'salt & pepper' )
+    d = 0.05;      % default noise density, 
+    
+    if nargs > 0 
+        d = noiseParams(1);
+    end
+    
+    noisyI = imnoise( I, 'salt & pepper', d );
+end
 
 % Output: Signal-to-noise ratio
 SNR = snr(I, noisyI - I);
