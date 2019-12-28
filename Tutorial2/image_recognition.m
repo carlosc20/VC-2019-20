@@ -1,6 +1,6 @@
 
 %%%%%%%%%%%% parametros %%%%%%%%%%%%
-fileName = 'coins.jpg';
+fileName = 'coins3.jpg';
 noiseType = 'gaussian'; % gaussian ou salt-an-pepper
 noiseParameters = [0,0.01]; % parametros do noise. Se for Gaussian, [media, variancia]. Se for Sal & Pepper, [ densidade ].
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
