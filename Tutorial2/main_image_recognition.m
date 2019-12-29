@@ -33,17 +33,14 @@ SNR = snr(I, noisyI - I);
 
 
 %% Pre-processing
-% Process  the  image,  when  necessary,  using  pre-processing  
-% techniques,  such  as filtering methods, contrast equalization, 
-% normalization, among other techniques. 
 
+I = adapthisteq(I);
 preProcI = I;
          
 
-
 %% Segmentation
-
-%%% Convert the image into binary form
+%{
+%%% Convert the image into binary form 
 % adaptive thresholding
 level = adaptthresh(I,0.5,'ForegroundPolarity','dark');
 BW = imcomplement(imbinarize(I,level));
@@ -56,30 +53,64 @@ BW2 = imclose(BW, SE); % fills the gaps between regions
 BW3 = imfill(BW2,'holes'); % region filling
 imshowpair(BW2,BW3,'montage')
 
-BW3 = imresize(BW3, 0.25);
+BW3 = impyramid(impyramid(BW3, 'reduce'), 'reduce');
+%BW3 = imresize(BW3, 0.25);
 
+imshow(BW3);
+axis on;
+[centers, radii] = imfindcircles(BW3,[30 90],'ObjectPolarity','bright');
+%[centers, radii] = imfindcircles(BW3,[30 75],'ObjectPolarity','bright');
+viscircles(centers, radii,'EdgeColor','r','LineWidth',4);
+centers
+radii
 
 % BW4 = bwmorph(BW3,'remove');
-e = edge(I,'Canny',0.15);
+%}
+
+%
+
+% reduz resolução da imagem para facilitar o processamento
+while size(I,1) >= 1500 || size(I,2) >= 1500
+    I = impyramid(I, 'reduce');
+end
+
+pcount = 0;
+
+while true
+    E = edge(I,'Canny', [0.1 0.4]);
+    [centers, radii] = imfindcircles(E,[50 150],'ObjectPolarity','bright','Sensitivity',0.91);
+    count = size(centers,1);
+
+    if count < pcount
+      centers = pcenters;
+      radii = pradii;
+      I = pI;
+      break;
+    end
+
+    if size(I,1) <= 600 || size(I,2) <= 600
+    break;
+    end
+
+    pcenters = centers;
+    pradii = radii;
+    pcount = count;
+    pI = I;
+
+    I = impyramid(I, 'reduce');
+end
+
+figure('Name','Edge'); imshow(I); axis on;
+viscircles(centers, radii,'EdgeColor','r','LineWidth',2);
 
 
-%imshowpair(e,BW4,'montage')
-
-%imshow(imresize(I, 0.25));
-axis on;
-
-
-[centers, radii] = imfindcircles(BW3,[50 100],'ObjectPolarity','bright');
-
-%viscircles(centers, radii,'EdgeColor','r','LineWidth',4);
-centers
-
-
+%
 
 
 % Output: Segmented image with and without noise;
 segI = 0;
 segNoisyI = 0; 
+
 
 %% Result analysis
 %{
@@ -92,12 +123,13 @@ stats = regionprops('table',BW,{'Area','Centroid'})
 
 
 % Output: Number and type of coins available in the image e total
-coinDist = 0;
+coinDist = size(centers,1);
 
 % Output: Histogram showing the distribution of object sizes
 % Either area or radius could be used as a size measure
-sizeHist = 0;
-
+sizeHist = histogram(radii);
+xlabel('raio');
+ylabel('número');
 
 end
 
