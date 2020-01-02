@@ -17,7 +17,7 @@ image = double(image)/255;
 
 
 %% funcao:
-[ preProcI, segI, segNoisyI, SNR, radii, coinCount ] = main_image_recognition( image, noiseType, noiseParameters );
+[ preProcNI, radii, centers, edgeI, radiiN, centersN, edgeNI, SNR ] = main_image_recognition( image, noiseType, noiseParameters );
 
 
 %% resultados:
@@ -26,20 +26,29 @@ image = double(image)/255;
 SNR
 
 % imagem pre-processada
-figure; imshow(preProcI);
+figure; imshow(preProcNI);
 title('Pre-processed image');
 
 % imagens segmentadas
-% segI, segNoisyI ???????????'
+% sem ruído
+figure; imshow(edgeI); axis on;
+viscircles(centers, radii,'EdgeColor','r','LineWidth',2);
+title('Segmented coins');
+
+% com ruído
+figure; imshow(edgeNI); axis on;
+viscircles(centersN, radiiN,'EdgeColor','r','LineWidth',2);
+title('Segmented coins, noisy');
+
 
 % histograma de raios das moedas
-figure; histogram(radii);
+figure; histogram(radiiN);
 title('Histogram of Coin Radii');
 xlabel('radius');
 ylabel('count');
 
 % nr de moedas
-coinCount
+coins = size(centersN,1)
 
 
 %% extras

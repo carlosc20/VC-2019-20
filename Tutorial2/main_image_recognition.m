@@ -1,4 +1,4 @@
-function [ preProcI, segI, segNoisyI, SNR, coinRadii, coinCount ] = main_image_recognition( I, noiseType, noiseParams )
+function [ preProcNI, radii, centers, edgeI, radiiN, centersN, edgeNI, SNR ] = main_image_recognition( I, noiseType, noiseParams )
 
 nargs = size(noiseParams,2);
 
@@ -15,6 +15,8 @@ if strcmp( noiseType, 'gaussian' )
     end
     
     noisyI = imnoise( I, 'gaussian', m, var_gauss );
+    
+    F = imgaussfilt(noisyI, 0.5);
 end
 
 if strcmp( noiseType, 'salt & pepper' )
@@ -25,6 +27,8 @@ if strcmp( noiseType, 'salt & pepper' )
     end
     
     noisyI = imnoise( I, 'salt & pepper', d );
+    
+    F = medfilt2(I);
 end
 
 % Output: Signal-to-noise ratio of noisy image
@@ -33,69 +37,66 @@ SNR = snr(I, noisyI - I);
 
 %% Pre-processing
 
-I = adapthisteq(I);
+I = preproc(I);
 
-se = strel('disk',25);
-I = imtophat(I,se);
-
-I = imadjust(I);
-figure; imshow(I);  
+noisyI = preproc(F);
 
 % Output: Pre-processed image
-preProcI = I;
+preProcNI = noisyI;
 
 
 %% Segmentation
 
-% reduz resolução da imagem para facilitar o processamento
-while size(I,1) >= 1500 || size(I,2) >= 1500
-    I = impyramid(I, 'reduce');
+% Output: binary edges image, radii and centers of detected circles, with and without noise;
+[ radii, centers, edgeI ] = findCircles(I, [0.1 0.4], [50 150], 0.93);
+[ radiiN, centersN, edgeNI ] = findCircles(noisyI, [0.1 0.4], [50 150], 0.93);
+
+
 end
 
-pcount = 0;
-while true
-    E = edge(I,'Canny', [0.1 0.4]);
-    figure; imshow(E);  
-    [centers, radii] = imfindcircles(E,[50 150],'ObjectPolarity','bright','Sensitivity',0.93);
-    count = size(centers,1);
-
-    if count < pcount
-      centers = pcenters;
-      radii = pradii;
-      I = pI;
-      break;
+function [ radii, centers, J ] = findCircles(I, threshold, radiusRange, sensitivity)
+    % reduz resolução da imagem para facilitar o processamento
+    while size(I,1) >= 1500 || size(I,2) >= 1500
+        I = impyramid(I, 'reduce');
     end
 
-    if size(I,1) <= 600 || size(I,2) <= 600
-    break;
+    pcount = 0;
+    while true
+        E = edge(I,'Canny',[0.1 0.4]);
+        [centers, radii] = imfindcircles(E,radiusRange,'ObjectPolarity','bright','Sensitivity',sensitivity);
+        count = size(centers,1);
+
+        if count < pcount
+          centers = pcenters;
+          radii = pradii;
+          I = pI;
+          break;
+        end
+
+        if size(I,1) <= 600 || size(I,2) <= 600
+        break;
+        end
+
+        pcenters = centers;
+        pradii = radii;
+        pcount = count;
+        pI = I;
+
+        I = impyramid(I, 'reduce');
     end
 
-    pcenters = centers;
-    pradii = radii;
-    pcount = count;
-    pI = I;
-
-    I = impyramid(I, 'reduce');
+    J = I;
 end
 
 
-% edge + posição circulos
-figure('Name','Edge'); imshow(I); axis on;
-viscircles(centers, radii,'EdgeColor','r','LineWidth',2);
 
-% Output: Segmented image with and without noise;
-segI = 0;
-segNoisyI = 0; 
+function J = preproc( I )
+    I = adapthisteq(I);
 
+    se = strel('disk',25);
+    I = imtophat(I,se);
 
-%% Result analysis
-
-% Output: Total number of coins
-coinCount = size(centers,1);
-
-% Output: Coins radii
-coinRadii = radii;
-
-
+    J = imadjust(I);
 end
+
 
