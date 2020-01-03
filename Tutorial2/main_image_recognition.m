@@ -62,7 +62,7 @@ function [ radii, centers, J ] = findCircles(I, threshold, radiusRange, sensitiv
 
     pcount = 0;
     while true
-        E = edge(I,'Canny',[0.1 0.4]);
+        E = edge(I,'Canny',threshold);
         [centers, radii] = imfindcircles(E,radiusRange,'ObjectPolarity','bright','Sensitivity',sensitivity);
         count = size(centers,1);
 
