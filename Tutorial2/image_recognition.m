@@ -1,13 +1,13 @@
 
 %%%%%%%%%%%% parametros %%%%%%%%%%%%
 % nome do ficheiro da imagem
-fileName = 'coins2.jpg';
+fileName = 'coins3.jpg';
 
 % gaussian ou salt-an-pepper
-noiseType = 'gaussian'; 
+noiseType = 'salt & pepper'; 
 
 % parametros do noise. Se for Gaussian, [media, variancia]. Se for Sal & Pepper, [ densidade ].
-noiseParameters = [0,0.01];
+noiseParameters = [0.06];
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
@@ -22,20 +22,19 @@ image = double(image)/255;
 
 %% resultados:
 
-% signal to noise ratio da imagem com ruído
+% signal to noise ratio da imagem com ruido
 SNR
-
 % imagem pre-processada
 figure; imshow(preProcNI);
 title('Pre-processed image');
 
 % imagens segmentadas
-% sem ruído
+% sem ruido
 figure; imshow(edgeI); axis on;
 viscircles(centers, radii,'EdgeColor','r','LineWidth',2);
 title('Segmented coins');
 
-% com ruído
+% com ruido
 figure; imshow(edgeNI); axis on;
 viscircles(centersN, radiiN,'EdgeColor','r','LineWidth',2);
 title('Segmented coins, noisy');
